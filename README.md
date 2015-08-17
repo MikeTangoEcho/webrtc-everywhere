@@ -1,4 +1,4 @@
-**Playground Version check https://github.com/sarandogou/webrtc-everywhere for original version *
+**Playground Version check https://github.com/sarandogou/webrtc-everywhere for original version **
 
 **webrtc-everywhere** is an open source project (with **business-friendly** <a href="#license">license</a>) to add support for WebRTC features to Safari (Windows and MAC OSX) and Internet Explorer (Windows).
 
