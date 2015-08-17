@@ -1,0 +1,33 @@
+[version]
+signature="$CHICAGO$"
+AdvancedINF=2.0
+
+; Executed in reverse. dll with dependance must be up.
+[Add.Code]
+webrtc-everywhere-ie.dll=webrtc-everywhere-ie.dll
+webrtc-everywhere-common.dll=webrtc-everywhere-common.dll
+x64\webrtc-everywhere-ie.dll=x64\webrtc-everywhere-ie.dll
+x64\webrtc-everywhere-common.dll=x64\webrtc-everywhere-common.dll
+
+[webrtc-everywhere-ie.dll]
+file-win32-x86=thiscab
+clsid={7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53}
+RegisterServer=yes
+; FileVersion=1,3,0,1
+
+[webrtc-everywhere-common.dll]
+file-win32-x86=thiscab
+clsid={7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53}
+; RegisterServer=yes
+; FileVersion=1,3,0,1
+
+[x64\webrtc-everywhere-ie.dll]
+file-win32-amd64=thiscab
+clsid={7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53}
+RegisterServer=yes
+; FileVersion=1,3,0,1
+
+[x64\webrtc-everywhere-common.dll]
+file-win32-amd64=thiscab
+; RegisterServer=yes
+; FileVersion=1,3,0,1
