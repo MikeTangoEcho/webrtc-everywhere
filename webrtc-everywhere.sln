@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31010.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webrtc-everywhere-ie", "ie\webrtc-everywhere-ie.vcxproj", "{FEF60750-96B0-4124-9007-B90780B6267D}"
 EndProject
@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		WebRTC.htm = WebRTC.htm
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCSharePermissions", "MFCSharePermissions\MFCSharePermissions.vcxproj", "{C3553EFD-D826-46CB-B34C-8941AB44701E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,6 +62,12 @@ Global
 		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.Release|Win32.Build.0 = Release|Win32
 		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.Release|x64.ActiveCfg = Release|x64
 		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.Release|x64.Build.0 = Release|x64
+		{C3553EFD-D826-46CB-B34C-8941AB44701E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C3553EFD-D826-46CB-B34C-8941AB44701E}.Debug|Win32.Build.0 = Debug|Win32
+		{C3553EFD-D826-46CB-B34C-8941AB44701E}.Debug|x64.ActiveCfg = Debug|Win32
+		{C3553EFD-D826-46CB-B34C-8941AB44701E}.Release|Win32.ActiveCfg = Release|Win32
+		{C3553EFD-D826-46CB-B34C-8941AB44701E}.Release|Win32.Build.0 = Release|Win32
+		{C3553EFD-D826-46CB-B34C-8941AB44701E}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

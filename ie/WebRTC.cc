@@ -335,7 +335,32 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 		CHECK_HR_RETURN(hr = m_spLocation->get_protocol(&protocol));
 		CHECK_HR_RETURN(hr = m_spLocation->get_host(&host));
 	}
-	CHECK_HR_RETURN(hr = _Utils::MsgBoxGUM(gumAccepted, protocol, host, m_hWnd));
+	//Dynamically Load DLL for Permissions Dialog
+	
+	HINSTANCE hInstance;
+	hInstance = ::LoadLibrary(L"D:\\instadeo\\webrtc\\webrtc-everywhere\\Debug\\webrtc-sharepermissions-ie.dll");
+	if (hInstance){
+		typedef double (WMFCFUNC)(double);
+		WMFCFUNC* pFunction;
+		//InitPermissionDialog
+		//showPermissionDialog
+		//getChosenSourceInfos
+		pFunction = (WMFCFUNC*)::GetProcAddress(hInstance, "showPermissionDialog");
+		if (pFunction)
+		{
+			double bResult = (*pFunction)(NULL); // Call the DLL function
+			gumAccepted = FALSE;
+		}
+		else
+		{
+			gumAccepted = FALSE;
+		}
+		FreeLibrary(hInstance);
+	}
+	else {
+		CHECK_HR_RETURN(hr = _Utils::MsgBoxGUM(gumAccepted, protocol, host, m_hWnd));
+	}
+
 	if (!gumAccepted) {
 		if (_errorCallback) {
 			BrowserCallback* _cb = new BrowserCallback(WM_GETUSERMEDIA_ERROR, _errorCallback);
