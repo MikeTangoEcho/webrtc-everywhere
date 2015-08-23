@@ -63,12 +63,12 @@ BOOL CMFCSharePermissionsApp::InitInstance()
 	return TRUE;
 }
 
-extern "C" BOOL PASCAL EXPORT InitPermissionDialog()
+extern "C" BOOL PASCAL EXPORT initPermissionsDialog()
 {
 	return TRUE;
 }
 
-extern "C" BOOL PASCAL EXPORT showPermissionDialog()
+extern "C" BOOL PASCAL EXPORT showPermissionsDialog()
 {
 	CSharePermissionsDlg dlg;
 	dlg.DoModal();

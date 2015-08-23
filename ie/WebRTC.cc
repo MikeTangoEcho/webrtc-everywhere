@@ -341,14 +341,15 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 	hInstance = ::LoadLibrary(L"D:\\instadeo\\webrtc\\webrtc-everywhere\\Debug\\webrtc-sharepermissions-ie.dll");
 	if (hInstance){
 		typedef double (WMFCFUNC)(double);
-		WMFCFUNC* pFunction;
-		//InitPermissionDialog
-		//showPermissionDialog
-		//getChosenSourceInfos
-		pFunction = (WMFCFUNC*)::GetProcAddress(hInstance, "showPermissionDialog");
-		if (pFunction)
+		WMFCFUNC* pFinitPermissionsDialog;
+		WMFCFUNC* pFshowPermissionsDialog;
+		WMFCFUNC* pFgetChosenSourceInfos;
+		pFinitPermissionsDialog = (WMFCFUNC*)::GetProcAddress(hInstance, "initPermissionsDialog");
+		pFshowPermissionsDialog = (WMFCFUNC*)::GetProcAddress(hInstance, "showPermissionsDialog");
+		pFgetChosenSourceInfos = (WMFCFUNC*)::GetProcAddress(hInstance, "getChosenSourceInfos");
+		if (pFinitPermissionsDialog && pFshowPermissionsDialog && pFgetChosenSourceInfos)
 		{
-			double bResult = (*pFunction)(NULL); // Call the DLL function
+			double bResult = (*pFshowPermissionsDialog)(NULL); // Call the DLL function
 			gumAccepted = FALSE;
 		}
 		else

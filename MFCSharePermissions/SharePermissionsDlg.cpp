@@ -13,7 +13,8 @@ IMPLEMENT_DYNAMIC(CSharePermissionsDlg, CDialogEx)
 CSharePermissionsDlg::CSharePermissionsDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CSharePermissionsDlg::IDD, pParent)
 {
-
+	p_lAudio = NULL;
+	p_lVideo = NULL;
 }
 
 CSharePermissionsDlg::CSharePermissionsDlg(std::list<LPCTSTR>* plVideo, std::list<LPCTSTR>* plAudio, CWnd* pParent /*=NULL*/)
@@ -46,7 +47,7 @@ BOOL CSharePermissionsDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO: ajoutez ici une initialisation supplémentaire
-	if (m_cbAudio && m_cbVideo){
+	if (p_lVideo && p_lAudio){
 		m_cbVideo.AddString(L"NONE");
 		m_cbAudio.AddString(L"NONE");
 		for (std::list<LPCTSTR>::iterator it = p_lVideo->begin(); it != p_lVideo->end(); ++it)
