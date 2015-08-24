@@ -328,7 +328,7 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 	CComPtr<IDispatch>_errorCallback = Utils::VariantToDispatch(errorCallback);
 
 #if 1
-	bool gumAccepted;
+	bool gumAccepted = false;
 	CComBSTR protocol;
 	CComBSTR host;
 	if (m_spLocation) {
@@ -339,24 +339,23 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 	
 	HINSTANCE hInstance;
 	hInstance = ::LoadLibrary(L"D:\\instadeo\\webrtc\\webrtc-everywhere\\Debug\\webrtc-sharepermissions-ie.dll");
+	/*
+	wchar_t path[200];
+	GetModuleFileName(NULL, path, 200);
+	hInstance = ::LoadLibrary(L"webrtc-sharepermissions-ie.dll");
+	*/
 	if (hInstance){
-		typedef double (WMFCFUNC)(double);
-		WMFCFUNC* pFinitPermissionsDialog;
-		WMFCFUNC* pFshowPermissionsDialog;
-		WMFCFUNC* pFgetChosenSourceInfos;
-		pFinitPermissionsDialog = (WMFCFUNC*)::GetProcAddress(hInstance, "initPermissionsDialog");
-		pFshowPermissionsDialog = (WMFCFUNC*)::GetProcAddress(hInstance, "showPermissionsDialog");
-		pFgetChosenSourceInfos = (WMFCFUNC*)::GetProcAddress(hInstance, "getChosenSourceInfos");
-		if (pFinitPermissionsDialog && pFshowPermissionsDialog && pFgetChosenSourceInfos)
+		cpp11::shared_ptr<_Sequence<_SourceInfo>> sourceInfos = _MediaStreamTrack::getSourceInfos();
+		std::string* VideoSourceId = new std::string();
+		std::string* AudioSourceId = new std::string();
+		typedef bool (WINAPI *WMFCFN1)(cpp11::shared_ptr<_Sequence<_SourceInfo>>, std::string* pVideoSourceId, std::string* pAudioSourceId);
+		WMFCFN1 pFshowPermissionsDialog;
+		pFshowPermissionsDialog = (WMFCFN1)(::GetProcAddress(hInstance, "showPermissionsDialog"));
+		if (pFshowPermissionsDialog)
 		{
-			double bResult = (*pFshowPermissionsDialog)(NULL); // Call the DLL function
-			gumAccepted = FALSE;
+			gumAccepted = pFshowPermissionsDialog(sourceInfos, VideoSourceId, AudioSourceId);
 		}
-		else
-		{
-			gumAccepted = FALSE;
-		}
-		FreeLibrary(hInstance);
+		::FreeLibrary(hInstance);
 	}
 	else {
 		CHECK_HR_RETURN(hr = _Utils::MsgBoxGUM(gumAccepted, protocol, host, m_hWnd));

@@ -3,7 +3,5 @@
 LIBRARY
 
 EXPORTS
-	initPermissionsDialog
 	showPermissionsDialog
-	getChosenSourceInfos
     ; Explicit exports can go here

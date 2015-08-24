@@ -63,19 +63,15 @@ BOOL CMFCSharePermissionsApp::InitInstance()
 	return TRUE;
 }
 
-extern "C" BOOL PASCAL EXPORT initPermissionsDialog()
+extern "C" bool PASCAL EXPORT showPermissionsDialog(std::shared_ptr<_Sequence<_SourceInfo>> plSourceInfos,
+	std::string* pVideoSourceId, std::string* pAudioSourceId)
 {
-	return TRUE;
-}
-
-extern "C" BOOL PASCAL EXPORT showPermissionsDialog()
-{
-	CSharePermissionsDlg dlg;
-	dlg.DoModal();
-	return TRUE;
-}
-
-extern "C" BOOL PASCAL EXPORT getChosenSourceInfos()
-{
-	return TRUE;
+	CSharePermissionsDlg dlg(plSourceInfos, pVideoSourceId, pAudioSourceId);
+	INT_PTR result = dlg.DoModal();
+	if (result == IDOK)
+	{
+		return true;
+	}
+	else
+		return false;
 }

@@ -44,6 +44,9 @@
     <ClInclude Include="SharePermissionsDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SourceInfos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="MFCSharePermissions.def">
