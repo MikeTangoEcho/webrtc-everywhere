@@ -262,14 +262,24 @@ _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoT
 	if (!m_track) {
 		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
 		if (peer_connection_factory) {
+#if 1
+			std::string sourceId;
+			if (constrains && constrains->mandatory())
+			{
+				sourceId = constrains->mandatory()->at("sourceId");
+				constrains->mandatory()->erase("sourceId");
+			}			
+#endif
 			__MediaConstraintsObj _constrainsObject(constrains ? constrains->optional() : nullPtr, constrains ? constrains->mandatory() : nullPtr);
 			rtc::scoped_refptr<_RTCMediaConstraints> _constrains = BuildConstraints(&_constrainsObject);
+#if 0
 			std::string sourceId;
 			if (_constrains) {
 				if (!_constrains->GetMandatory().FindFirst("sourceId", &sourceId)) {
 					_constrains->GetOptional().FindFirst("sourceId", &sourceId);
 				}
 			}
+#endif
 			cricket::VideoCapturer* capturer = OpenVideoCaptureDevice(sourceId);
 			if (!capturer) {
 				WE_DEBUG_ERROR("Failed to open video capture device");

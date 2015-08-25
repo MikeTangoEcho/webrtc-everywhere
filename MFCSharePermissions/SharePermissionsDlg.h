@@ -12,7 +12,7 @@ class CSharePermissionsDlg : public CDialogEx
 public:
 	CSharePermissionsDlg(CWnd* pParent = NULL);   // standard constructor
 	CSharePermissionsDlg(std::shared_ptr<_Sequence<_SourceInfo>> plSourceInfos,
-		std::string* pVideoSourceId, std::string* pAudioSourceId,
+		LPTSTR host, LPCH pVideoSourceId, LPCH pAudioSourceId,
 		CWnd* pParent = NULL);	// constructeur avec Sources
 	virtual ~CSharePermissionsDlg();
 
@@ -22,8 +22,9 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	std::shared_ptr<_Sequence<_SourceInfo>> p_lSourceInfos;
-	std::string* p_VideoSourceId;
-	std::string* p_AudioSourceId;
+	LPCH p_VideoSourceId;
+	LPCH p_AudioSourceId;
+	LPTSTR pHost;
 	// Gens
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()

@@ -17,11 +17,12 @@ CSharePermissionsDlg::CSharePermissionsDlg(CWnd* pParent /*=NULL*/)
 }
 
 CSharePermissionsDlg::CSharePermissionsDlg(std::shared_ptr<_Sequence<_SourceInfo>> plSourceInfos,
-	std::string* pVideoSourceId, std::string* pAudioSourceId,
+	LPTSTR host, LPCH pVideoSourceId, LPCH pAudioSourceId,
 	CWnd* pParent /*=NULL*/)
 	: CDialogEx(CSharePermissionsDlg::IDD, pParent)
 {
 	p_lSourceInfos = plSourceInfos;
+	pHost = host;
 	p_VideoSourceId = pVideoSourceId;
 	p_AudioSourceId = pAudioSourceId;
 }
@@ -70,6 +71,9 @@ BOOL CSharePermissionsDlg::OnInitDialog()
 	m_cbAudio.AddString(str);
 	m_cbVideo.SetCurSel(0);
 	m_cbAudio.SetCurSel(0);
+	str.LoadString(IDS_STATIC_HOST);
+	str.Replace(L"%s", pHost);
+	m_sHostmsg.SetWindowText(str);
 	return TRUE;  // retourne TRUE, sauf si vous avez défini le focus sur un contrôle
 }
 
@@ -103,9 +107,9 @@ void CSharePermissionsDlg::setChosenSources()
 		{
 			str = CString(it->get()->label.c_str());
 			if (it->get()->kind == kVideo && sVideo == str)
-				*p_VideoSourceId = it->get()->sourceId;
+				strcpy_s(p_VideoSourceId, 200, it->get()->sourceId.c_str());
 			else if (it->get()->kind == kAudio && sAudio == str)
-				*p_AudioSourceId = it->get()->sourceId;
+				strcpy_s(p_AudioSourceId, 200, it->get()->sourceId.c_str());
 		}
 	}
 }

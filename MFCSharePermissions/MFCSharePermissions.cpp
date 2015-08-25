@@ -51,7 +51,7 @@ CMFCSharePermissionsApp::CMFCSharePermissionsApp()
 
 // The one and only CMFCSharePermissionsApp object
 
-CMFCSharePermissionsApp theApp;
+//CMFCSharePermissionsApp theApp;
 
 
 // CMFCSharePermissionsApp initialization
@@ -64,9 +64,9 @@ BOOL CMFCSharePermissionsApp::InitInstance()
 }
 
 extern "C" bool PASCAL EXPORT showPermissionsDialog(std::shared_ptr<_Sequence<_SourceInfo>> plSourceInfos,
-	std::string* pVideoSourceId, std::string* pAudioSourceId)
+	LPTSTR host, LPCH pVideoSourceId, LPCH pAudioSourceId)
 {
-	CSharePermissionsDlg dlg(plSourceInfos, pVideoSourceId, pAudioSourceId);
+	CSharePermissionsDlg dlg(plSourceInfos, host, pVideoSourceId, pAudioSourceId);
 	INT_PTR result = dlg.DoModal();
 	if (result == IDOK)
 	{
