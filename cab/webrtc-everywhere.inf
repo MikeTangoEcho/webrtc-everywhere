@@ -6,6 +6,7 @@ AdvancedINF=2.0
 [Add.Code]
 webrtc-everywhere-ie.dll=webrtc-everywhere-ie.dll
 webrtc-everywhere-common.dll=webrtc-everywhere-common.dll
+webrtc-sharepermissions-ie.dll=webrtc-sharepermissions-ie.dll
 x64\webrtc-everywhere-ie.dll=x64\webrtc-everywhere-ie.dll
 x64\webrtc-everywhere-common.dll=x64\webrtc-everywhere-common.dll
 
@@ -18,6 +19,11 @@ RegisterServer=yes
 [webrtc-everywhere-common.dll]
 file-win32-x86=thiscab
 clsid={7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53}
+; RegisterServer=yes
+; FileVersion=1,3,0,1
+
+[webrtc-sharepermissions-ie.dll]
+file-win32-x86=thiscab
 ; RegisterServer=yes
 ; FileVersion=1,3,0,1
 

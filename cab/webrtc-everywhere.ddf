@@ -6,9 +6,10 @@
 .Set CabinetNameTemplate=webrtc-everywhere.cab
 .Set MaxDiskFileCount=0
 .Set MaxDiskSize=0
-"webrtc-everywhere.inf"
+"webrtc-dll\webrtc-everywhere.inf"
 "webrtc-dll\webrtc-everywhere-common.dll"
 "webrtc-dll\webrtc-everywhere-ie.dll"
+"webrtc-sharepermissions-ie.dll"
 .Set DestinationDir=x64
 "webrtc-dll\x64\webrtc-everywhere-common.dll"
 "webrtc-dll\x64\webrtc-everywhere-ie.dll"

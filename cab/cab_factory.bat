@@ -9,7 +9,7 @@
 SETLOCAL
 set winsdk="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\"
 set win32="C:\Windows\System32\"
-set lib_folder="..\webrtc-everywhere-master\"
+set lib_folder="..\webrtc-everywhere\"
 set cab_folder=webrtc-dll
 set cab_ddt=cab_result
 set cab_filename=webrtc-everywhere
@@ -28,6 +28,7 @@ IF "%1%" == "sigchk" GOTO SIGCHK
 IF "%1%" == "source" (
  copy /Y %lib_folder%"\Release\webrtc-everywhere-ie.dll"			%cab_folder%"\webrtc-everywhere-ie.dll"
  copy /Y %lib_folder%"\Release\webrtc-everywhere-common.dll"		%cab_folder%"\webrtc-everywhere-common.dll"
+ copy /Y %lib_folder%"\Release\webrtc-sharepermissions-ie.dll"		%cab_folder%"\webrtc-sharepermissions-ie.dll"
  copy /Y %lib_folder%"\x64\Release\webrtc-everywhere-ie.dll" 		%cab_folder%"\x64\webrtc-everywhere-ie.dll"
  copy /Y %lib_folder%"\x64\Release\webrtc-everywhere-common.dll"	%cab_folder%"\x64\webrtc-everywhere-common.dll"
 )
@@ -53,6 +54,7 @@ GOTO EOF
 :: Sign DLL
 %winsdk%signtool sign /v /f %keyname%.pfx /p %keypass% %keytimestamp% "%cab_folder%\webrtc-everywhere-common.dll"
 %winsdk%signtool sign /v /f %keyname%.pfx /p %keypass% %keytimestamp% "%cab_folder%\webrtc-everywhere-ie.dll"
+%winsdk%signtool sign /v /f %keyname%.pfx /p %keypass% %keytimestamp% "%cab_folder%\webrtc-sharepermissions-ie.dll"
 %winsdk%signtool sign /v /f %keyname%.pfx /p %keypass% %keytimestamp% "%cab_folder%\x64\webrtc-everywhere-common.dll"
 %winsdk%signtool sign /v /f %keyname%.pfx /p %keypass% %keytimestamp% "%cab_folder%\x64\webrtc-everywhere-ie.dll"
 GOTO EOF
@@ -71,6 +73,7 @@ GOTO EOF
 :: Verify File
 %winsdk%signtool verify "%cab_folder%\x64\webrtc-everywhere-common.dll"
 %winsdk%signtool verify "%cab_folder%\x64\webrtc-everywhere-ie.dll"
+%winsdk%signtool verify "%cab_folder%\webrtc-sharepermissions-ie.dll"
 %winsdk%signtool verify "%cab_folder%\webrtc-everywhere-common.dll"
 %winsdk%signtool verify "%cab_folder%\webrtc-everywhere-ie.dll"
 %winsdk%signtool verify "%cab_ddt%\%cab_filename%.cab"

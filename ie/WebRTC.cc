@@ -405,9 +405,12 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 		else
 		{
 			map = mediaStreamConstraints->video()->mandatory();
-			if (map->find(std::string("sourceId")) != map->end())
-				map->erase(std::string("sourceId"));
-			map->insert(std::pair<std::string, std::string>("sourceId", std::string(VideoSourceId)));
+			if (map)
+			{
+				if (map->find(std::string("sourceId")) != map->end())
+					map->erase(std::string("sourceId"));
+				map->insert(std::pair<std::string, std::string>("sourceId", std::string(VideoSourceId)));
+			}
 		}
 		if (strlen(AudioSourceId) == 0)
 		{
@@ -416,9 +419,12 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 		else
 		{
 			map = mediaStreamConstraints->audio()->mandatory();
-			if (map->find(std::string("sourceId")) != map->end())
-				map->erase(std::string("sourceId"));
-			map->insert(std::pair<std::string, std::string>("sourceId", std::string(AudioSourceId)));
+			if (map)
+			{
+				if (map->find(std::string("sourceId")) != map->end())
+					map->erase(std::string("sourceId"));
+				map->insert(std::pair<std::string, std::string>("sourceId", std::string(AudioSourceId)));
+			}
 		}
 	}
 
