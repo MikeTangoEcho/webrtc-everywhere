@@ -263,6 +263,8 @@ _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoT
 		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
 		if (peer_connection_factory) {
 #if 1
+			//Retreive sourceId and delete it from the constraints because it is not defined in peer_connection_factocy
+			//Thus we end up on an error, a captured webcam with no image
 			std::string sourceId;
 			if (constrains && constrains->mandatory())
 			{

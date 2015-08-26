@@ -339,6 +339,8 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 
 	CHAR VideoSourceId[200];
 	CHAR AudioSourceId[200];
+	memset(VideoSourceId, '\0', 200);
+	memset(AudioSourceId, '\0', 200);
 #if WE_UNDER_WINDOWS
 	//Dynamically Load DLL for Permissions Dialog
 	HINSTANCE hInstance;
@@ -396,14 +398,28 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 	if (gumAsked)
 	{
 		cpp11::shared_ptr<_MediaConstraints> map;
-		map = mediaStreamConstraints->video()->mandatory();
-		if (map->find(std::string("sourceId")) != map->end())
-			map->erase(std::string("sourceId"));
-		map->insert(std::pair<std::string, std::string>("sourceId", std::string(VideoSourceId)));
-		map = mediaStreamConstraints->audio()->mandatory();
-		if (map->find(std::string("sourceId")) != map->end())
-			map->erase(std::string("sourceId"));
-		map->insert(std::pair<std::string, std::string>("sourceId", std::string(AudioSourceId)));
+		if (strlen(VideoSourceId) == 0)
+		{
+			mediaStreamConstraints = std::make_shared<_MediaStreamConstraints>(mediaStreamConstraints->audio(), cpp11::make_shared<_MediaTrackConstraints>(false));
+		}
+		else
+		{
+			map = mediaStreamConstraints->video()->mandatory();
+			if (map->find(std::string("sourceId")) != map->end())
+				map->erase(std::string("sourceId"));
+			map->insert(std::pair<std::string, std::string>("sourceId", std::string(VideoSourceId)));
+		}
+		if (strlen(AudioSourceId) == 0)
+		{
+			mediaStreamConstraints = std::make_shared<_MediaStreamConstraints>(cpp11::make_shared<_MediaTrackConstraints>(false), mediaStreamConstraints->video());
+		}
+		else
+		{
+			map = mediaStreamConstraints->audio()->mandatory();
+			if (map->find(std::string("sourceId")) != map->end())
+				map->erase(std::string("sourceId"));
+			map->insert(std::pair<std::string, std::string>("sourceId", std::string(AudioSourceId)));
+		}
 	}
 
 
