@@ -268,8 +268,10 @@ _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoT
 			std::string sourceId;
 			if (constrains && constrains->mandatory())
 			{
-				sourceId = constrains->mandatory()->at("sourceId");
-				constrains->mandatory()->erase("sourceId");
+				cpp11::shared_ptr<_MediaConstraints> map = constrains->mandatory();
+				sourceId = map->at("sourceId");
+				map->erase("sourceId");
+				//constrains->mandatory()->clear();
 			}			
 #endif
 			__MediaConstraintsObj _constrainsObject(constrains ? constrains->optional() : nullPtr, constrains ? constrains->mandatory() : nullPtr);
