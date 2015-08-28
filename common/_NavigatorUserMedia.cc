@@ -53,3 +53,42 @@ void _NavigatorUserMedia::getUserMedia(const _MediaStreamConstraints* constraint
 	}
 }
 
+void _NavigatorUserMedia::getUserMedia(bool gumAsked /*= false*/, std::string audioSource /*= ""*/,	std::string videoSource /*= ""*/, const _MediaStreamConstraints* constraints/*= NULL*/, _NavigatorUserMediaSuccessCallback successCallback/*= nullPtr*/, _NavigatorUserMediaErrorCallback errorCallback /*= nullPtr*/)
+{
+#define RAISE_ERR(e) { \
+		WE_DEBUG_ERROR(e); \
+		if (errorCallback) { \
+			cpp11::shared_ptr<_NavigatorUserMediaError> err(new _NavigatorUserMediaError(e)); \
+			errorCallback(err); \
+						} \
+	}
+
+	cpp11::shared_ptr<_MediaStream> stream(new _MediaStream());
+	if (!stream) {
+		RAISE_ERR("Failed to create media stream");
+		return;
+	}
+
+	bool bHaveAudio = !constraints || !constraints->audio() || !constraints->audio()->isBool() || constraints->audio()->boolVal();
+	bool bHaveVideo = !constraints || !constraints->video() || !constraints->video()->isBool() || constraints->video()->boolVal();
+
+	bHaveAudio = bHaveAudio && (!gumAsked || (gumAsked && audioSource != ""));
+	bHaveVideo = bHaveVideo && (!gumAsked || (gumAsked && videoSource != ""));
+
+	if (bHaveAudio) {
+		_MediaStreamTrackAudio audio(audioSource, NULL, constraints ? constraints->audio().get() : NULL);
+		if (audio.IsValid()) {
+			stream->addTrack(&audio);
+		}
+	}
+	if (bHaveVideo) {
+		_MediaStreamTrackVideo video(videoSource, NULL, constraints ? constraints->video().get() : NULL);
+		if (video.IsValid()) {
+			stream->addTrack(&video);
+		}
+	}
+
+	if (successCallback) {
+		successCallback(stream);
+	}
+}

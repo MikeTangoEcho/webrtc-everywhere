@@ -389,45 +389,10 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 
 	hr = Utils::BuildMediaStreamConstraints(constraints, mediaStreamConstraints);
 
-	// Define the chosen SourceId from the Dialog
-	// constraints audio/video must not be bool, and have mandatory/optional attribute defined with an empty array
-	// Example JS:
-	// constraint = {mandatory: [], optional: [] };
-	// constraints = { audio: constraint, video : constraint };
-	// WebRTC Google => sourceId constraint is unknown => ERROR
-	if (gumAsked)
-	{
-		cpp11::shared_ptr<_MediaConstraints> map;
-		if (strlen(VideoSourceId) == 0)
-		{
-			mediaStreamConstraints = std::make_shared<_MediaStreamConstraints>(mediaStreamConstraints->audio(), cpp11::make_shared<_MediaTrackConstraints>(false));
-		}
-		else
-		{
-			if (mediaStreamConstraints->video() && mediaStreamConstraints->video()->mandatory()){
-				map = mediaStreamConstraints->video()->mandatory();
-				if (map->find(std::string("sourceId")) != map->end())
-					map->erase(std::string("sourceId"));
-				map->insert(std::pair<std::string, std::string>("sourceId", std::string(VideoSourceId)));
-			}
-		}
-		if (strlen(AudioSourceId) == 0)
-		{
-			mediaStreamConstraints = std::make_shared<_MediaStreamConstraints>(cpp11::make_shared<_MediaTrackConstraints>(false), mediaStreamConstraints->video());
-		}
-		else
-		{
-			if (mediaStreamConstraints->audio() && mediaStreamConstraints->audio()->mandatory()){
-				map = mediaStreamConstraints->audio()->mandatory();
-				if (map->find(std::string("sourceId")) != map->end())
-					map->erase(std::string("sourceId"));
-				map->insert(std::pair<std::string, std::string>("sourceId", std::string(AudioSourceId)));
-			}
-		}
-	}
-
-
 	_NavigatorUserMedia::getUserMedia(
+		gumAsked,
+		std::string(AudioSourceId),
+		std::string(VideoSourceId),
 		mediaStreamConstraints.get(),
 		[_successCallback, this](std::shared_ptr<_MediaStream> stream) {
 			if (_successCallback) {
