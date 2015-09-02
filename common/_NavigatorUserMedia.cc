@@ -26,6 +26,14 @@ void _NavigatorUserMedia::getUserMedia(const _MediaStreamConstraints* constraint
 				} \
 	}
 
+#if WE_UNDER_WINDOWS
+	// On windows, when the plugin is loaded a second time ThreadManager lose the current Thread pointer.
+	// Then we have a crash on VideoCapturer.CaptureState because thread_ = NULL
+	if (!rtc::Thread::Current()){
+		rtc::ThreadManager::Instance()->SetCurrentThread(_Utils::GetWin32Thread());
+	}
+#endif
+
 	cpp11::shared_ptr<_MediaStream> stream(new _MediaStream());
 	if (!stream) {
 		RAISE_ERR("Failed to create media stream");
@@ -62,6 +70,14 @@ void _NavigatorUserMedia::getUserMedia(bool gumAsked /*= false*/, std::string au
 			errorCallback(err); \
 						} \
 	}
+
+#if WE_UNDER_WINDOWS
+	// On windows, when the plugin is loaded a second time ThreadManager lose the current Thread pointer.
+	// Then we have a crash on VideoCapturer.CaptureState because thread_ = NULL
+	if (!rtc::Thread::Current()){
+		rtc::ThreadManager::Instance()->SetCurrentThread(_Utils::GetWin32Thread());
+	}
+#endif
 
 	cpp11::shared_ptr<_MediaStream> stream(new _MediaStream());
 	if (!stream) {

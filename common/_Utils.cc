@@ -101,6 +101,17 @@ WeError _Utils::DeInitialize(void)
 	return WeError_Success;
 }
 
+#if WE_UNDER_WINDOWS
+rtc::Thread* _Utils::GetWin32Thread(void)
+{
+	static rtc::Win32Thread w32_thread;
+	return &w32_thread;
+}
+#endif 
+
+
+
+
 WeError _Utils::StartDebug(void)
 {
 #if WE_UNDER_WINDOWS
