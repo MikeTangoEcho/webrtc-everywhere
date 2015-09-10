@@ -241,7 +241,8 @@ LRESULT CALLBACK _Utils::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 				SetTextAlign(hdc, TA_CENTER | TA_BASELINE);
-				LPCTSTR pszText = TEXT("ATL 8.0 : WebRTC Plugin");
+				//LPCTSTR pszText = TEXT("ATL 8.0 : WebRTC Plugin");
+				LPCTSTR pszText = TEXT("WebRTC Plugin");
 #ifndef _WIN32_WCE
 				TextOut(hdc,
 					(rc.left + rc.right) / 2,
@@ -285,7 +286,8 @@ LRESULT CALLBACK _Utils::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			_BrowserCallback* _cb = reinterpret_cast<_BrowserCallback*>(wParam);
 			if (_cb) {
 				_cb->Invoke();
-				_cb->ReleaseObject();
+				SafeReleaseObject(&_cb);
+				//_cb->ReleaseObject();
 			}
 			break;
 		}
