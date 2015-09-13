@@ -56,7 +56,7 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 {
     if (!g_bInitialized) {
         s_InitThread = rtc::Thread::Current();
-#if 0
+#ifdef DEBUG
         StartDebug();
 #endif
 
@@ -285,8 +285,11 @@ LRESULT CALLBACK _Utils::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		{
 			_BrowserCallback* _cb = reinterpret_cast<_BrowserCallback*>(wParam);
 			if (_cb) {
+				WE_DEBUG_INFO("RaiseCallback: %d", uMsg);
 				_cb->Invoke();
 				SafeReleaseObject(&_cb);
+				if (_cb)
+					delete _cb;
 				//_cb->ReleaseObject();
 			}
 			break;

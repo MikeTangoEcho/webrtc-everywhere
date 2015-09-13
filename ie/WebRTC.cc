@@ -72,6 +72,7 @@ void CWebRTC::FinalRelease()
 	m_spDoc = NULL;
 	m_spWindow = NULL;
 	ReleaseFakePeerConnectionFactory();
+	//Clean Everything after use
 	_Utils::DeInitialize();
 }
 

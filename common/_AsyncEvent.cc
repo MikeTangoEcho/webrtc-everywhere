@@ -12,14 +12,26 @@ _AsyncEventDispatcher::_AsyncEventDispatcher()
 	: m_Hwnd(NULL)
 #if WE_UNDER_WINDOWS
 	, m_Proc(NULL)
+	, m_eventSetWindows(NULL)
+	, m_eventWaitTimeout(1500)
 #endif
 {
-
+#if WE_UNDER_WINDOWS 
+	m_eventSetWindows = CreateEvent(
+		NULL,	// Default security
+		TRUE,	// Manual Reset
+		FALSE,	// Initiale state
+		TEXT("_AsyncEventDispatcher::SetWindow")	// Event Name
+		);
+#endif
 }
 
 _AsyncEventDispatcher::~_AsyncEventDispatcher()
 {
 	SetWindow(NULL, false);
+#if WE_UNDER_WINDOWS
+	CloseHandle(m_eventSetWindows);
+#endif
 }
 
 bool _AsyncEventDispatcher::SetWindow(HWND hWnd, bool bSubClass /*= true*/)
@@ -39,10 +51,11 @@ bool _AsyncEventDispatcher::SetWindow(HWND hWnd, bool bSubClass /*= true*/)
 				return false;
 			}
 			// SetWindowLongPtr(m_Hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+			SetEvent(m_eventSetWindows);
 		}
 	}
 #endif
-
+	WE_DEBUG_INFO("Set Window Handle 0x%x", m_Hwnd);
 	return true;
 }
 
@@ -53,6 +66,18 @@ LONGLONG _AsyncEventDispatcher::GetWindowHandle()
 
 bool _AsyncEventDispatcher::RaiseCallback(_BrowserCallback* cb)
 {
+	//Wait for A Window
+	DWORD dWaitResult = 0;
+	if (!m_Hwnd)
+	{
+		WE_DEBUG_INFO("Waiting for window Handle");
+		dWaitResult = WaitForSingleObject(
+			m_eventSetWindows,
+			m_eventWaitTimeout);
+		if (dWaitResult != WAIT_OBJECT_0)
+			WE_DEBUG_WARN("WaitResult: %d", dWaitResult);
+	}
+	//END
 	return _Utils::RaiseCallback(GetWindowHandle(), cb);
 }
 
