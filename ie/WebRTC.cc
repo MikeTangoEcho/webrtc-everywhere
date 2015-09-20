@@ -50,6 +50,7 @@ CWebRTC::CWebRTC()
 	, m_nbackBuffHeight(0)
 {
 	m_bWindowOnly = TRUE;
+	tmp_thread = NULL;
 }
 
 HRESULT CWebRTC::FinalConstruct()
@@ -73,6 +74,11 @@ void CWebRTC::FinalRelease()
 	m_spWindow = NULL;
 	ReleaseFakePeerConnectionFactory();
 	//Clean Everything after use
+	if (tmp_thread)
+	{
+		TerminateThread(tmp_thread, 0);
+		CloseHandle(tmp_thread);
+	}
 	_Utils::DeInitialize();
 }
 
@@ -321,6 +327,112 @@ bail:
 	return hr;
 }
 
+
+bool CWebRTC::getUserMediaPermission()
+{
+	HRESULT hr = S_OK;
+
+	bool gumAccepted = false;
+	CComBSTR protocol;
+	CComBSTR host;
+	if (m_spLocation) {
+		/*CHECK_HR_RETURN(hr =*/ m_spLocation->get_protocol(&protocol)/*)*/;
+		/*CHECK_HR_RETURN(hr =*/ m_spLocation->get_host(&host)/*)*/;
+	}
+
+	bool gumAsked = false;
+	CHAR VideoSourceId[200];
+	CHAR AudioSourceId[200];
+	memset(VideoSourceId, '\0', 200);
+	memset(AudioSourceId, '\0', 200);
+	//Dynamically Load DLL for Permissions Dialog
+	HINSTANCE hInstance;
+	WCHAR wCurrentMFN[200];
+	LPTSTR wCurrentMN = _T("webrtc-everywhere-ie.dll");
+	LPTSTR wDialogMN = L"webrtc-sharepermissions-ie.dll";
+	DWORD pathSize = GetModuleFileName(GetModuleHandle(wCurrentMN), wCurrentMFN, 200);
+	// Load DLL in the same folder
+	if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+	{
+		LPTSTR pwc = wCurrentMFN + pathSize - wcslen(wCurrentMN);
+		wcscpy(pwc, wDialogMN);
+		hInstance = ::LoadLibrary(wCurrentMFN);
+	}
+	if (hInstance)
+	{
+		cpp11::shared_ptr<_Sequence<_SourceInfo>> sourceInfos = _MediaStreamTrack::getSourceInfos();
+		typedef bool (WINAPI *WMFCFN1)(cpp11::shared_ptr<_Sequence<_SourceInfo>>, LPTSTR, LPCH, LPCH);
+		WMFCFN1 pFshowPermissionsDialog;
+		pFshowPermissionsDialog = (WMFCFN1)(::GetProcAddress(hInstance, "showPermissionsDialog"));
+		if (pFshowPermissionsDialog)
+		{
+			gumAccepted = pFshowPermissionsDialog(sourceInfos, host, VideoSourceId, AudioSourceId);
+		}
+		::FreeLibrary(hInstance);
+		gumAsked = true;
+	}
+
+	CComPtr<IDispatch> _successCallback = tmp_successCallback;
+	CComPtr<IDispatch> _errorCallback = tmp_errorCallback;
+	std::shared_ptr<_MediaStreamConstraints> mediaStreamConstraints = tmp_mediaStreamConstraints;
+
+	if (!gumAccepted) {
+		if (_errorCallback) {
+			BrowserCallback* _cb = new BrowserCallback(WM_GETUSERMEDIA_ERROR, _errorCallback);
+			if (_cb) {
+				CComBSTR err("Permission to access camera/microphone denied");
+				_cb->AddBSTR(err);
+				dynamic_cast<_AsyncEventDispatcher*>(this)->RaiseCallback(_cb);
+				SafeReleaseObject(&_cb);
+			}
+		}
+		return false;
+	}
+
+	_NavigatorUserMedia::getUserMedia(
+		gumAsked,
+		std::string(AudioSourceId),
+		std::string(VideoSourceId),
+		mediaStreamConstraints.get(),
+		[_successCallback, this](std::shared_ptr<_MediaStream> stream) {
+		if (_successCallback) {
+			CComObject<CMediaStream>* _stream;
+			HRESULT _hr = Utils::CreateInstanceWithRef(&_stream);
+			if (SUCCEEDED(_hr)) {
+				BrowserCallback* _cb = new BrowserCallback(WM_GETUSERMEDIA_SUCESS, _successCallback);
+				if (_cb) {
+					_stream->SetStream(stream);
+					_stream->SetDispatcher(this);
+					_cb->AddDispatch(_stream);
+					dynamic_cast<_AsyncEventDispatcher*>(this)->RaiseCallback(_cb);
+					SafeReleaseObject(&_cb);
+				}
+				SafeRelease(&_stream);
+			}
+		}
+	},
+		[_errorCallback, this](std::shared_ptr<_NavigatorUserMediaError> e) {
+		if (_errorCallback) {
+			BrowserCallback* _cb = new BrowserCallback(WM_GETUSERMEDIA_ERROR, _errorCallback);
+			if (_cb) {
+				CComBSTR err(e->constraintName.c_str());
+				_cb->AddBSTR(err);
+				dynamic_cast<_AsyncEventDispatcher*>(this)->RaiseCallback(_cb);
+				SafeReleaseObject(&_cb);
+			}
+		}
+	}
+	);
+
+	return gumAccepted;
+}
+
+DWORD threadUMP(LPVOID lpParam)
+{
+	CWebRTC* wrtc = (CWebRTC*)lpParam;
+	return wrtc->getUserMediaPermission();
+}
+
 STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback, VARIANT errorCallback)
 {
 	HRESULT hr = S_OK;
@@ -328,9 +440,8 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 	CComPtr<IDispatch>_constraints = Utils::VariantToDispatch(constraints);
 	CComPtr<IDispatch>_successCallback = Utils::VariantToDispatch(successCallback);
 	CComPtr<IDispatch>_errorCallback = Utils::VariantToDispatch(errorCallback);
-
-#if 1
-	bool gumAsked = false;
+	
+#if 0
 	bool gumAccepted = false;
 	CComBSTR protocol;
 	CComBSTR host;
@@ -339,11 +450,12 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 		CHECK_HR_RETURN(hr = m_spLocation->get_host(&host));
 	}
 
+#if WE_UNDER_WINDOWS
+	bool gumAsked = false;
 	CHAR VideoSourceId[200];
 	CHAR AudioSourceId[200];
 	memset(VideoSourceId, '\0', 200);
 	memset(AudioSourceId, '\0', 200);
-#if WE_UNDER_WINDOWS
 	//Dynamically Load DLL for Permissions Dialog
 	HINSTANCE hInstance;
 	WCHAR wCurrentMFN[200];
@@ -391,6 +503,15 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 
 	hr = Utils::BuildMediaStreamConstraints(constraints, mediaStreamConstraints);
 
+	tmp_successCallback = _successCallback;
+	tmp_errorCallback = _errorCallback;
+	tmp_mediaStreamConstraints = mediaStreamConstraints;
+	tmp_thread = CreateThread(NULL, NULL,
+		(LPTHREAD_START_ROUTINE)threadUMP,
+		(LPVOID)this, NULL, NULL);
+	return hr;
+
+#if 0
 	_NavigatorUserMedia::getUserMedia(
 		gumAsked,
 		std::string(AudioSourceId),
@@ -424,9 +545,9 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 				}
 			}
 		}
-		);
-
-		return hr;
+	);
+	return hr;
+#endif
 }
 
 STDMETHODIMP CWebRTC::createDictOptions(IDispatch** ppDictOptions)

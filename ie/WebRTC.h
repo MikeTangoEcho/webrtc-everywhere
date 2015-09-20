@@ -6,6 +6,7 @@
 #include "../common/_RTCDisplay.h"
 #include "../common/_Common.h"
 #include "../common/_Buffer.h"
+#include "../common/_MediaStreamConstraints.h"
 #include "resource.h"       // main symbols
 #include <atlctl.h>
 #include "webrtceverywhere_i.h"
@@ -229,6 +230,7 @@ public:
 	
 	HRESULT GetDispatch(CComPtr<IDispatch> &spDispatch);
 	HRESULT GetHTMLWindow2(CComPtr<IHTMLWindow2> &spWindow2);
+	bool getUserMediaPermission();
 
 	private:
 		HRESULT QueryWindow();
@@ -245,6 +247,11 @@ public:
 		CComPtr<IHTMLWindow2> m_spWindow;
 		int m_nBackBuffWidth;
 		int m_nbackBuffHeight;
+		
+		HANDLE	tmp_thread;
+		CComPtr<IDispatch> tmp_successCallback;
+		CComPtr<IDispatch> tmp_errorCallback;
+		std::shared_ptr<_MediaStreamConstraints> tmp_mediaStreamConstraints;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WebRTC), CWebRTC)
