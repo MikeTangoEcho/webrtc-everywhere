@@ -72,6 +72,8 @@ void CWebRTC::FinalRelease()
 	m_spDoc = NULL;
 	m_spWindow = NULL;
 	ReleaseFakePeerConnectionFactory();
+	//Clean Everything after use
+	_Utils::DeInitialize();
 }
 
 HRESULT CWebRTC::QueryWindow()
@@ -328,14 +330,50 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 	CComPtr<IDispatch>_errorCallback = Utils::VariantToDispatch(errorCallback);
 
 #if 1
-	bool gumAccepted;
+	bool gumAsked = false;
+	bool gumAccepted = false;
 	CComBSTR protocol;
 	CComBSTR host;
 	if (m_spLocation) {
 		CHECK_HR_RETURN(hr = m_spLocation->get_protocol(&protocol));
 		CHECK_HR_RETURN(hr = m_spLocation->get_host(&host));
 	}
-	CHECK_HR_RETURN(hr = _Utils::MsgBoxGUM(gumAccepted, protocol, host, m_hWnd));
+
+	CHAR VideoSourceId[200];
+	CHAR AudioSourceId[200];
+	memset(VideoSourceId, '\0', 200);
+	memset(AudioSourceId, '\0', 200);
+#if WE_UNDER_WINDOWS
+	//Dynamically Load DLL for Permissions Dialog
+	HINSTANCE hInstance;
+	WCHAR wCurrentMFN[200];
+	LPTSTR wCurrentMN = _T("webrtc-everywhere-ie.dll");
+	LPTSTR wDialogMN = L"webrtc-sharepermissions-ie.dll";
+	DWORD pathSize = GetModuleFileName(GetModuleHandle(wCurrentMN), wCurrentMFN, 200);
+	// Load DLL in the same folder
+	if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+	{
+		LPTSTR pwc = wCurrentMFN + pathSize - wcslen(wCurrentMN);
+		wcscpy(pwc, wDialogMN);
+		hInstance = ::LoadLibrary(wCurrentMFN);
+	}
+	if (hInstance)
+	{
+		cpp11::shared_ptr<_Sequence<_SourceInfo>> sourceInfos = _MediaStreamTrack::getSourceInfos();
+		typedef bool (WINAPI *WMFCFN1)(cpp11::shared_ptr<_Sequence<_SourceInfo>>, LPTSTR, LPCH, LPCH);
+		WMFCFN1 pFshowPermissionsDialog;
+		pFshowPermissionsDialog = (WMFCFN1)(::GetProcAddress(hInstance, "showPermissionsDialog"));
+		if (pFshowPermissionsDialog)
+		{
+			gumAccepted = pFshowPermissionsDialog(sourceInfos, host, VideoSourceId, AudioSourceId);
+		}
+		::FreeLibrary(hInstance);
+		gumAsked = true;
+	}
+#endif
+	if (!gumAsked)
+		CHECK_HR_RETURN(hr = _Utils::MsgBoxGUM(gumAccepted, protocol, host, m_hWnd));
+
 	if (!gumAccepted) {
 		if (_errorCallback) {
 			BrowserCallback* _cb = new BrowserCallback(WM_GETUSERMEDIA_ERROR, _errorCallback);
@@ -349,12 +387,14 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 		return S_OK;
 	}
 #endif
-
 	std::shared_ptr<_MediaStreamConstraints> mediaStreamConstraints;
 
 	hr = Utils::BuildMediaStreamConstraints(constraints, mediaStreamConstraints);
-	
+
 	_NavigatorUserMedia::getUserMedia(
+		gumAsked,
+		std::string(AudioSourceId),
+		std::string(VideoSourceId),
 		mediaStreamConstraints.get(),
 		[_successCallback, this](std::shared_ptr<_MediaStream> stream) {
 			if (_successCallback) {

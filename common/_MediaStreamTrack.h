@@ -128,6 +128,7 @@ class _MediaStreamTrackAudio
 {
 public:
 	_MediaStreamTrackAudio(rtc::scoped_refptr<webrtc::AudioTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
+	_MediaStreamTrackAudio(std::string sourceId, rtc::scoped_refptr<webrtc::AudioTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
 	virtual ~_MediaStreamTrackAudio();
 
 	WE_INLINE virtual bool IsValid() { return !!m_track; }
@@ -151,6 +152,7 @@ class _MediaStreamTrackVideo
 {
 public:
 	_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
+	_MediaStreamTrackVideo(std::string sourceId, rtc::scoped_refptr<webrtc::VideoTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
 	virtual ~_MediaStreamTrackVideo();
 
 	WE_INLINE virtual bool IsValid() { return !!m_track; }

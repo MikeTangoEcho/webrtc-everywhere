@@ -233,6 +233,24 @@ _MediaStreamTrackAudio::_MediaStreamTrackAudio(rtc::scoped_refptr<webrtc::AudioT
 	InitLocalVarsToAvoidDanglingPointerIssue();
 }
 
+// TODO Use chosen sourceId from dialog
+_MediaStreamTrackAudio::_MediaStreamTrackAudio(std::string sourceId,
+	rtc::scoped_refptr<webrtc::AudioTrackInterface> track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
+	: _MediaStreamTrackBase(_MediaStreamTrackTypeAudio, track, constrains)
+	, m_track(track)
+{
+	if (!m_track) {
+		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
+		if (peer_connection_factory) {
+			m_label += "_audio_track";
+			__MediaConstraintsObj _constrainsObject(constrains ? constrains->optional() : nullPtr, constrains ? constrains->mandatory() : nullPtr);
+			m_track = peer_connection_factory->CreateAudioTrack(m_label, peer_connection_factory->CreateAudioSource(BuildConstraints(&_constrainsObject)));
+		}
+	}
+	InitLocalVarsToAvoidDanglingPointerIssue();
+}
+
+
 _MediaStreamTrackAudio::~_MediaStreamTrackAudio()
 {
 	m_track = NULL;
@@ -270,6 +288,36 @@ _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoT
 					_constrains->GetOptional().FindFirst("sourceId", &sourceId);
 				}
 			}
+			cricket::VideoCapturer* capturer = OpenVideoCaptureDevice(sourceId);
+			if (!capturer) {
+				WE_DEBUG_ERROR("Failed to open video capture device");
+				return;
+			}
+			m_label += "_video_track";
+			m_track = peer_connection_factory->CreateVideoTrack(m_label, peer_connection_factory->CreateVideoSource(capturer, _constrains));
+		}
+	}
+	InitLocalVarsToAvoidDanglingPointerIssue();
+}
+
+_MediaStreamTrackVideo::_MediaStreamTrackVideo(std::string sourceId,
+	rtc::scoped_refptr<webrtc::VideoTrackInterface> track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
+	: _MediaStreamTrackBase(_MediaStreamTrackTypeVideo, track, constrains)
+	, m_track(track)
+{
+	if (!m_track) {
+		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
+		if (peer_connection_factory) {
+			__MediaConstraintsObj _constrainsObject(constrains ? constrains->optional() : nullPtr, constrains ? constrains->mandatory() : nullPtr);
+			rtc::scoped_refptr<_RTCMediaConstraints> _constrains = BuildConstraints(&_constrainsObject);
+#if 0
+			std::string sourceId;
+			if (_constrains) {
+				if (!_constrains->GetMandatory().FindFirst("sourceId", &sourceId)) {
+					_constrains->GetOptional().FindFirst("sourceId", &sourceId);
+				}
+			}
+#endif
 			cricket::VideoCapturer* capturer = OpenVideoCaptureDevice(sourceId);
 			if (!capturer) {
 				WE_DEBUG_ERROR("Failed to open video capture device");

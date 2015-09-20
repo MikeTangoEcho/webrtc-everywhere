@@ -43,6 +43,8 @@ private:
 	HWND m_Hwnd;
 #if WE_UNDER_WINDOWS
 	WNDPROC m_Proc;
+	HANDLE m_eventSetWindows;
+	DWORD m_eventWaitTimeout;
 #endif
 };
 

@@ -56,7 +56,7 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 {
     if (!g_bInitialized) {
         s_InitThread = rtc::Thread::Current();
-#if 0
+#ifdef DEBUG
         StartDebug();
 #endif
 
@@ -100,6 +100,17 @@ WeError _Utils::DeInitialize(void)
 	}
 	return WeError_Success;
 }
+
+#if WE_UNDER_WINDOWS
+rtc::Thread* _Utils::GetWin32Thread(void)
+{
+	static rtc::Win32Thread w32_thread;
+	return &w32_thread;
+}
+#endif 
+
+
+
 
 WeError _Utils::StartDebug(void)
 {
@@ -230,7 +241,8 @@ LRESULT CALLBACK _Utils::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 				SetTextAlign(hdc, TA_CENTER | TA_BASELINE);
-				LPCTSTR pszText = TEXT("ATL 8.0 : WebRTC Plugin");
+				//LPCTSTR pszText = TEXT("ATL 8.0 : WebRTC Plugin");
+				LPCTSTR pszText = TEXT("WebRTC Plugin");
 #ifndef _WIN32_WCE
 				TextOut(hdc,
 					(rc.left + rc.right) / 2,
@@ -273,8 +285,12 @@ LRESULT CALLBACK _Utils::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		{
 			_BrowserCallback* _cb = reinterpret_cast<_BrowserCallback*>(wParam);
 			if (_cb) {
+				WE_DEBUG_INFO("RaiseCallback: %d", uMsg);
 				_cb->Invoke();
-				_cb->ReleaseObject();
+				SafeReleaseObject(&_cb);
+				if (_cb)
+					delete _cb;
+				//_cb->ReleaseObject();
 			}
 			break;
 		}

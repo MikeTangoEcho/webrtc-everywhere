@@ -53,8 +53,12 @@ public:
 
 	static void SetUserAgent(const char* userAgent);
 	static const char* GetUserAgent();
-    
-    static rtc::Thread* GetInitThread() { return  s_InitThread; }
+
+#if WE_UNDER_WINDOWS
+	// Retreive Win32 Static Thread
+	static rtc::Thread* GetWin32Thread();
+#endif 
+	static rtc::Thread* GetInitThread() { return  s_InitThread; }
 
 private:
 #if _MSC_VER

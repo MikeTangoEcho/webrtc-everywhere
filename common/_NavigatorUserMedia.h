@@ -14,6 +14,13 @@ class WEBRTC_EVERYWHERE_API _NavigatorUserMedia
 public:
 	// void getUserMedia (MediaStreamConstraints? constraints, NavigatorUserMediaSuccessCallback successCallback, NavigatorUserMediaErrorCallback errorCallback);
 	static void getUserMedia(const _MediaStreamConstraints* constraints = NULL, _NavigatorUserMediaSuccessCallback successCallback = nullPtr, _NavigatorUserMediaErrorCallback errorCallback = nullPtr);
+	// Overload for Share Dialog
+	static void getUserMedia(bool gumAsked = false,
+		std::string audioSource = "",
+		std::string videoSource = "",
+		const _MediaStreamConstraints* constraints = NULL,
+		_NavigatorUserMediaSuccessCallback successCallback = nullPtr,
+		_NavigatorUserMediaErrorCallback errorCallback = nullPtr);
 };
 
 #endif /* _WEBRTC_EVERYWHERE_COMMON_NAVIGATORUSERMEDIA_H_ */

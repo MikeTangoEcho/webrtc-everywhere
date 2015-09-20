@@ -1,0 +1,7 @@
+; MFCSharePermissions.def : Declares the module parameters for the DLL.
+
+LIBRARY
+
+EXPORTS
+	showPermissionsDialog
+    ; Explicit exports can go here
