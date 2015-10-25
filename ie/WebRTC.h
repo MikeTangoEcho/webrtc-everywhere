@@ -162,6 +162,7 @@ public:
 
     STDMETHOD(get_versionName)(BSTR* pVal);
 	STDMETHOD(getUserMedia)(VARIANT constraints, VARIANT successCallback, VARIANT errorCallback);
+	STDMETHOD(getWindowList)(__out BSTR* winList);
 	STDMETHOD(createDisplay)(__out IDispatch** ppDisplay);
 	STDMETHOD(createSessionDescription)(VARIANT RTCSessionDescriptionInit, IDispatch** ppSdp);
     STDMETHOD(createDictOptions)(IDispatch** ppDictOptions);

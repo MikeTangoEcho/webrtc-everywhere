@@ -115,6 +115,15 @@ typedef enum _ArrayType
 }
 _ArrayType;
 
+typedef enum __TrackType {
+	_TrackTypeNone = 0x00,
+	_TrackTypeAudio = (0x01 << 0),
+	_TrackTypeVideo = (0x01 << 1),
+	_TrackTypeAudioVideo = _TrackTypeAudio | _TrackTypeVideo,
+	_TrackTypeAll = 0xFF
+}
+_TrackType;
+
 typedef struct __TrustedWebsite {
 	std::string scheme;
 	std::string host;
@@ -354,6 +363,13 @@ struct _Sequence {
 	void Add(cpp11::shared_ptr<T> v) {
 		values.push_back(v);
 	}
+	void AddSeq(_Sequence<T>* seq) {
+		if (seq) {
+			for (size_t i = 0; i < seq->values.size(); ++i) {
+				values.push_back(seq->values[i]);
+			}
+		}
+	}
 	~_Sequence() {
 		Clear();
 	}
@@ -417,6 +433,18 @@ protected:
 private:
     long m_id;
 };
+
+// _Window
+typedef struct __Window{
+	intptr_t id;
+	std::string title;
+	__Window(intptr_t id_, std::string title_) {
+		id = id_;
+		title = title_;
+	}
+}
+_Window;
+typedef std::vector<_Window> _WindowList;
 
 class _File {
 public:
@@ -585,6 +613,7 @@ extern WEBRTC_EVERYWHERE_API rtc::Thread* GetWorkerThread();
 extern WEBRTC_EVERYWHERE_API rtc::scoped_refptr<webrtc::PortAllocatorFactoryInterface> GetPortAllocatorFactory();
 extern WEBRTC_EVERYWHERE_API void TakeFakePeerConnectionFactory();
 extern WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory();
+extern WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList* windowList);
 extern rtc::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _MediaConstraintsObj* constraints = NULL);
 extern webrtc::MediaStreamInterface* BuildMediaStream(const _MediaStream* stream);
 

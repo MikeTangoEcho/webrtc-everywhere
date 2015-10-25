@@ -70,7 +70,7 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 #endif
 #endif
         
-#if WE_UNDER_MAC
+#if WE_UNDER_MAC && 0 // Must not enable: https://github.com/sarandogou/webrtc-everywhere/issues/42
         static rtc::MacCocoaSocketServer ss;
         static rtc::SocketServerScope ss_scope(&ss);
 #endif
@@ -216,6 +216,10 @@ LRESULT CALLBACK _Utils::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		{
 			return TRUE; // avoid background erasing.
 		}
+		case WM_WINDOWPOSCHANGING:
+			break;
+		case WM_WINDOWPOSCHANGED:
+			break;
 		case WM_PAINT:
 		{
 			_RTCDisplay* display = dynamic_cast<_RTCDisplay*>(reinterpret_cast<_RTCDisplay*>(GetWindowLongPtr(hWnd, GWLP_USERDATA)));

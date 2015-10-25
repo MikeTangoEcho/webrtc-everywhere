@@ -15,6 +15,8 @@
 
 #if WE_UNDER_WINDOWS
 #	include <Windows.h>
+#   elif WE_UNDER_APPLE
+#   import <ApplicationServices/ApplicationServices.h>
 #endif
 
 //
@@ -410,6 +412,11 @@ static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string _deviceId, std
 			if (_windowId.empty()) {
 #if WE_UNDER_APPLE
 				rtc::WindowId::WindowT windowId_ = kCGNullWindowID;
+                // Top-most app is Safari (our app)
+                webrtc::WindowCapturer::WindowList windows;
+                if (_ScreenVideoCapturerFactory::GetWindowList(&windows) && windows.size() > 0) {
+                    windowId_ = (rtc::WindowId::WindowT)windows[0].id;
+                }
 #elif WE_UNDER_WINDOWS
 				rtc::WindowId::WindowT windowId_ = GetDesktopWindow();
 #else
