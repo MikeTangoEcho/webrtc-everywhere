@@ -3,14 +3,14 @@
 **webrtc-everywhere** is an open source project (with **business-friendly** <a href="#license">license</a>) to add support for WebRTC features to Safari (Windows and MAC OSX) and Internet Explorer (Windows).
 
 # Downloads
- - <a href="https://doubango.org/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> 
+ - <a href="https://doubango.org/webrtc/webrtc-everywhere-10.6.dmg" target="_blank">MAC OSX</a> 
  - <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
 
 # Online samples 
 The following samples use our <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> and could be tested on Safari and Internet Explorer (off course they also work on Firefox and Chrome): 
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia" target="_blank">getUserMedia()</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-resolution" target="_blank">Choose camera resolution</a>
- - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone</a>
+ - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone </a> (on version 2.0.0 it's also used to test screenshare)
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-audio" target="_blank">Audio-only getUserMedia() output to local audio element</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
@@ -43,12 +43,25 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  attachMediaStream(document.getElementById("eltId"), mediaStream);
   ```
 
+# Screenshare
+Support for screenshare was added in version 2.0. To choose your screen as video media source (instead of the camera) you need to use ***"X978DoubangoTelecomScreenCapturer785"*** as **sourceId**.
+
+![alt Screenshare](ScreenShare.png)
+
+
+Sample code to select your screen as media source: 
+ ```
+ navigator.getUserMedia({ "video": {optional: [{sourceId: "X978DoubangoTelecomScreenCapturer785"}]}}, okfn, errfn);
+ ```
+
 # Building source code
  - fetch webrtc code as explained at [http://www.webrtc.org/native-code/development](http://www.webrtc.org/native-code/development) in the **same folder** as webrtc-everywhere.
  - Move into **webrtc-checkout/src** directory <br />
  ```
  cd webrtc-checkout/src
  ```
+ - For Windows you'll need to apply [this patch](/webrtc_win.patch)
+
  - **OSX x86_64**<br />
  ```
  python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=mac
@@ -72,11 +85,8 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - **WIN64**<br />
  ```
  python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=win
- ninja -C out/Debug
- ninja -C out/Release
-
- mv out/Debug out/Debug_x64
- mv out/Release out/Release_x64
+ ninja -C out/Debug_x64
+ ninja -C out/Release_x64
  ```
  
  - **WIN32**<br />
@@ -104,14 +114,17 @@ To build the source code you'll need Visual Studio 2013+ (Windows) or Xcode (MAC
 The best way to get help is via our <a href="https://groups.google.com/forum/#!forum/webrtc-everywhere" target="_blank">dev-group</a>.
 
 # Release notes
+ - **2.0.0**
+  - Adds support for Screenshare on OSX and Windows
+  - Adds support for OSX X86_64
+  - Fix issue [#1](../../issues/1), [#16](../../issues/16), [#26](../../issues/26), [#28](../../issues/28), [#29](../../issues/29), [#31](../../issues/31) and [#32](../../issues/32)
+
  - **1.3.1**
   - Fix issue [Issue #24](../../issues/24), [Issue #23](../../issues/23), [Issue #22](../../issues/22), [Issue #21](../../issues/21), [Issue #19](../../issues/19), [Issue #15](../../issues/15), [Issue #13](../../issues/13) and [Issue #2](../../issues/2)
 
-# Release notes
  - **1.2.2**
   - Fix [Issue #17](../../issues/17) and [Issue #18](../../issues/18)
-  
-# Release notes
+
  - **1.2.1**
   - Fix [Issue #15](../../issues/15)
   - Adds support for x64 (Windows)
@@ -119,8 +132,6 @@ The best way to get help is via our <a href="https://groups.google.com/forum/#!f
    * to register the ActiveX under HKCU instead of HKLM
    * to install binaries under AppData folder instead of ProgramFiles
    * to bundle 32bit and 64bit binaries
-
-**It's highly recommended to uninstall any old version before installing this one**
 
  - **1.2.0**
  	- Adds <a href="http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannel" target="_blank">DataChannel</a> API with support for **Strings**, **BLOBs** and **ArrayBuffers** (Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array and Float64Array).
