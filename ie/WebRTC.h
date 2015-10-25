@@ -19,6 +19,16 @@
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
 
+// Struct to Gather data for User Permission Dialog
+typedef struct t_dialog_data
+{
+	HANDLE	thread;
+	CComPtr<IDispatch> successCallback;
+	CComPtr<IDispatch> errorCallback;
+	CComBSTR host;
+	std::shared_ptr<_MediaStreamConstraints> mediaStreamConstraints;
+} dialog_data;
+
 
 // CWebRTC
 class ATL_NO_VTABLE CWebRTC :
@@ -248,10 +258,7 @@ public:
 		int m_nBackBuffWidth;
 		int m_nbackBuffHeight;
 		
-		HANDLE	tmp_thread;
-		CComPtr<IDispatch> tmp_successCallback;
-		CComPtr<IDispatch> tmp_errorCallback;
-		std::shared_ptr<_MediaStreamConstraints> tmp_mediaStreamConstraints;
+		dialog_data  m_dialogData;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WebRTC), CWebRTC)
